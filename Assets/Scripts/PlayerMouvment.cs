@@ -12,10 +12,10 @@ public class PlayerMouvment : MonoBehaviour
     private InputAction	_jumpAction;
 
     private Vector2     _moveInput;
-    private Vector2     _lookInput;
     private Rigidbody	_rb;
 
 	[SerializeField] private float	_moveSpeed = 5f;
+	[SerializeField] private float	_movementSmoothing = 10f; // Higher values = more responsive, lower = smoother
 	[SerializeField] private bool	_isGrounded = true;
 	[SerializeField] private float	_jumpForce = 5f;
 
@@ -56,8 +56,15 @@ public class PlayerMouvment : MonoBehaviour
 
 	private void Walking()
 	{
-		_rb.MovePosition(_rb.position + transform.forward * _moveInput.y * _moveSpeed * Time.fixedDeltaTime + 
-						 transform.right * _moveInput.x * _moveSpeed * Time.fixedDeltaTime);
+		// Calculate target velocity based on input
+		Vector3 targetVelocity = transform.forward * _moveInput.y * _moveSpeed + 
+								 transform.right * _moveInput.x * _moveSpeed;
+		
+		// Smoothly interpolate current velocity towards target velocity
+		Vector3 smoothedVelocity = Vector3.Lerp(_rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * _movementSmoothing);
+		
+		// Apply the smoothed velocity (preserve Y velocity for jumping/gravity)
+		_rb.linearVelocity = new Vector3(smoothedVelocity.x, _rb.linearVelocity.y, smoothedVelocity.z);
 	}
 
 	private void OnCollisionEnter(Collision collision)
