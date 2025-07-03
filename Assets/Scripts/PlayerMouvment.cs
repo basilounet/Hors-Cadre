@@ -1,3 +1,5 @@
+using System.Drawing;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,6 +10,7 @@ public class PlayerMouvment : MonoBehaviour
 	[SerializeField] private GameObject			Camera;
     [SerializeField] private InputActionAsset	InputAction;
 	[SerializeField] private Animator 			_characterAnimator;
+	[SerializeField] private GameObject			_MoneyTextObject;
 
     private InputAction		_moveAction;
     private InputAction		_jumpAction;
@@ -17,6 +20,7 @@ public class PlayerMouvment : MonoBehaviour
     private Rigidbody		_rb;
 	private ParticleSystem	_jumpParticles;
 	private	bool			_isRunning;
+	private TextMeshProUGUI			_MoneyText;
 
 	[SerializeField] private float	_moveSpeed = 40f;
 	[SerializeField] private float	_runSpeed = 80f;
@@ -36,6 +40,7 @@ public class PlayerMouvment : MonoBehaviour
 		_rb = GetComponent<Rigidbody>();
 		_jumpParticles = GetComponentInChildren<ParticleSystem>();
 		_characterAnimator = GetComponent<Animator>();
+		_MoneyText = _MoneyTextObject.GetComponent<TextMeshProUGUI>();
 
 		// Lock cursor to center of screen for mouse look
 		Cursor.lockState = CursorLockMode.Locked;
@@ -60,6 +65,7 @@ public class PlayerMouvment : MonoBehaviour
 	void FixedUpdate()
 	{
 		_moveInput = _moveAction.ReadValue<Vector2>();
+		_MoneyText.text = "Money : " + Points._money.ToString() + " $$$";
 		Moving();
 	}
 

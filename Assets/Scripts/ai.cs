@@ -5,11 +5,14 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines;
+using static Points;
 
 public class ai : MonoBehaviour
 {
 	private static readonly int IsWalking = Animator.StringToHash("IsWalking");
 	private static readonly int Idle = Animator.StringToHash("Idle");
+	private static readonly int Sit = Animator.StringToHash("sit");
+
 	private struct Increment { public float min, max, time, delta; };
 
 	[SerializeField] private GameObject chair;
@@ -22,6 +25,7 @@ public class ai : MonoBehaviour
 	private Vector3 _lastTargetPos;
 	private Increment _madnessIncr;
 	public float _madness;
+	public string _state;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
@@ -29,22 +33,21 @@ public class ai : MonoBehaviour
 		_chairReached = false;
 		_onDesk = false;
 		_nma = GetComponent<NavMeshAgent>();
+		_characterAnimator = GetComponent<Animator>();
 		_lastTargetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_madnessIncr = new Increment { min = 0, max = 0.5f, time = 0, delta = 2 };
 		_madness = 0;
-		_lastChairPos = chair.transform.position + new Vector3(1, 1, 1);
-		_characterAnimator = GetComponent<Animator>();
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
 	{
 		_madness += HandleMadnessIncr();
 
 		if (_madness <= 20)
 			NormalBehaviour();
 		else if (_madness <= 45)
-			unBotheredBehaviour();
+			UnBotheredBehaviour();
 		else
 		{
 			_onDesk = false;
@@ -60,7 +63,7 @@ public class ai : MonoBehaviour
 
 	private float HandleMadnessIncr()
 	{
-		_madnessIncr.time += Time.deltaTime;
+		_madnessIncr.time += Time.fixedDeltaTime;
 		if (_madnessIncr.time >= _madnessIncr.delta)
 		{
 			_madnessIncr.time = 0;
@@ -71,20 +74,22 @@ public class ai : MonoBehaviour
 
 	private void NormalBehaviour()
 	{
+		_state = "Normal";
 		_madnessIncr = new Increment { min = 0.2f, max = 0.5f, time = _madnessIncr.time, delta = 2 };
-		if (Vector3.Distance(transform.position, chair.transform.position) > 2)
-		if (Vector3.Distance(transform.position, chair.transform.position) > 3.5) {
+		if (Vector3.Distance(transform.position, chair.transform.position) > 2f) {
 			_chairReached = false;
 			_characterAnimator.SetBool(IsWalking, true);
 		}
 		else
 		{
-			if (!_chairReached) {
+			if (!_chairReached)
 				_nma.SetDestination(transform.position);
-			}
 			_chairReached = true;
 			_characterAnimator.SetBool(IsWalking, false);
 			_characterAnimator.SetTrigger(Idle);
+			Points._money += 1 * Time.fixedDeltaTime;
+			//# get on desk
+			//# startwork
 		}
 		if (!_chairReached && chair.transform.position != _lastTargetPos)
 		{
@@ -92,22 +97,23 @@ public class ai : MonoBehaviour
 			if (!_onDesk)
 			{
 				_onDesk = true;
-				//# get on desk
-				//# startwork
+				_characterAnimator.SetTrigger(Sit);
 			}
 		}
-		Debug.Log(Vector3.Distance(transform.position, chair.transform.position));
-		Debug.Log(_nma.destination);
+		// Debug.Log(Vector3.Distance(transform.position, chair.transform.position));
+		// Debug.Log(_nma.destination);
 	}
 
-	private void unBotheredBehaviour()
+	private void UnBotheredBehaviour()
 	{
+		_state = "UnBothered";
 		_madnessIncr = new Increment { min = 0.3f, max = 0.75f, time = _madnessIncr.time, delta = 2 };
 		//#stopwork
 		//#on desk animations
 	}
 	private void DerangedBehaviour()
 	{
+		_state = "Deranged";
 		_madnessIncr = new Increment { min = 0.5f, max = 1, time = _madnessIncr.time, delta = 1.5f };
 		_onDesk = false;
 		_chairReached = false;
@@ -117,6 +123,7 @@ public class ai : MonoBehaviour
 	}
 	private void CrazyBehaviour()
 	{
+		_state = "Crazy";
 		_madnessIncr = new Increment { min = 0.75f, max = 1.25f, time = _madnessIncr.time, delta = 1.5f };
 		//# starts running around
 		_onDesk = false;
@@ -125,6 +132,7 @@ public class ai : MonoBehaviour
 	}
 	private void InsaneBehaviour()
 	{
+		_state = "Insane";
 		_madnessIncr = new Increment { min = 1, max = 1.5f, time = _madnessIncr.time, delta = 1.5f };
 		//# starts tweaking
 		_onDesk = false;
