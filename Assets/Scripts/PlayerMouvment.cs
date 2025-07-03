@@ -43,7 +43,8 @@ public class PlayerMouvment : MonoBehaviour
 			Jump();
     }
 
-	void Jump() {
+	void Jump()
+	{
 		_rb.AddForceAtPosition(new Vector3(0, _jumpForce, 0), Vector3.up, ForceMode.Impulse);
 		_isGrounded = false;
 	}
