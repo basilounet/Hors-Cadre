@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DoorOpen : MonoBehaviour
 {
 
+    [SerializeField] private InputActionAsset	_InputAction;
     public float open = 100f;
     public float range = 10f;
 
@@ -13,10 +16,17 @@ public class DoorOpen : MonoBehaviour
 
     public Camera fpsCam;
 
+    private InputAction		_interactAction;
+
+    private void Start()
+    {
+        _interactAction = _InputAction.FindActionMap("Player").FindAction("Jump");
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("f"))
+        if (_interactAction.WasPressedThisFrame())
         {
             Shoot();
         }
