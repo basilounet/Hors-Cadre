@@ -11,6 +11,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: RunType
     m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsRunning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 376658542130266238}
   m_Solo: 0
@@ -333,6 +336,32 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!1102 &-3255391103757819263
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: New Animation
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: 968bbd91020b2644caa7b8a64b6fd108, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1101 &-2318197206362347869
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -391,6 +420,9 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: -3626716660408672489}
     m_Position: {x: 920, y: 440, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: -3255391103757819263}
+    m_Position: {x: 955, y: 505, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: -5601422580703906806}
@@ -410,8 +442,8 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 2
-    m_ConditionEvent: IsRunning
+  - m_ConditionMode: 1
+    m_ConditionEvent: Idle
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6560673466545629746}
@@ -438,6 +470,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: RunType
     m_EventTreshold: 1
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsRunning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -8512296971984058126}
   m_Solo: 0
@@ -564,6 +599,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: RunType
     m_EventTreshold: 4
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsRunning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3626716660408672489}
   m_Solo: 0
@@ -596,6 +634,7 @@ AnimatorState:
   - {fileID: 5922637708130534589}
   - {fileID: 5896599743351018288}
   - {fileID: 2086168697172091505}
+  - {fileID: 3972400577910328305}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -654,6 +693,31 @@ AnimatorStateTransition:
   m_TransitionOffset: 0
   m_ExitTime: 0.53125
   m_HasExitTime: 1
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
+--- !u!1101 &3972400577910328305
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: WalkForward
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -7492226607570084506}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.75
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -773,6 +837,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: RunType
     m_EventTreshold: 3
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsRunning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7076213294451747842}
   m_Solo: 0
@@ -798,6 +865,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: RunType
     m_EventTreshold: 2
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsRunning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4891179289814784581}
   m_Solo: 0
