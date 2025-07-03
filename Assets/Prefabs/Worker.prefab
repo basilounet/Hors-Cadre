@@ -137,7 +137,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 1
 --- !u!114 &8779137829114228235
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ed66f5aa8fb483d9bb11586d21d6fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chair: {fileID: 7969471916373294010, guid: f4f1f970d755a13e99da53e7755ffdde, type: 3}
+  chair: {fileID: 0}
 --- !u!195 &8028190612491731650
 NavMeshAgent:
   m_ObjectHideFlags: 0
