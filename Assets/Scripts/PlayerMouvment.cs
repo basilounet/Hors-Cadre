@@ -3,8 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerMouvment : MonoBehaviour
 {
+	private static readonly int WalkForward = Animator.StringToHash("WalkForward");
 
-    [SerializeField] private GameObject			Camera;
+	[SerializeField] private GameObject			Camera;
     [SerializeField] private InputActionAsset	InputAction;
 	[SerializeField] private Animator 			_characterAnimator;
 
@@ -64,27 +65,22 @@ public class PlayerMouvment : MonoBehaviour
 
 	private void Moving()
 	{
-		Vector3 targetVelocity;
-		if (_SprintAction.IsPressed())
+		Vector3 targetVelocity = default;
+		if (_SprintAction.IsPressed() && _moveInput.y >= 0f)
 		{
 			_isRunning = true;
-			targetVelocity = transform.forward * _moveInput.y * _runSpeed +
-				transform.right * _moveInput.x * _runSpeed;
+			targetVelocity = transform.forward * (_moveInput.y * _runSpeed) +
+				transform.right * (_moveInput.x * _runSpeed);
 			_characterAnimator.SetBool("IsRunning", true);
 		}
 		else
 		{
 			_isRunning = false;
-			targetVelocity = transform.forward * _moveInput.y * _moveSpeed +
-				transform.right * _moveInput.x * _moveSpeed;
+			targetVelocity = transform.forward * (_moveInput.y * _moveSpeed) +
+				transform.right * (_moveInput.x * _moveSpeed);	
 			_characterAnimator.SetBool("IsRunning", false);
-		}
-		if (_moveInput.y < 0f)
-		{
-			_isRunning = false; // Stop running if moving backward
-			targetVelocity = transform.forward * _moveInput.y * _moveSpeed +
-				transform.right * _moveInput.x * _moveSpeed;
-			_characterAnimator.SetBool("IsRunning", false);
+			if (_moveInput.y > 0.1f || _moveInput.y < -0.1f)
+				_characterAnimator.SetTrigger(WalkForward);
 		}
 		// Calculate target velocity based on input
 
@@ -93,7 +89,7 @@ public class PlayerMouvment : MonoBehaviour
 		Vector3 smoothedVelocity = Vector3.Lerp(_rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * _movementSmoothing);
 
 		// Bool RunType : 0 - RunForward, 1 - RunForwardLeft, 2 - RunForwardRight, 3 - RunLeft, 4 - RunRight
-		_characterAnimator.SetInteger("RunType", 0); 
+		_characterAnimator.SetInteger("RunType", 0);
 		if (_moveInput.y > 0.1f && _moveInput.x < -0.1f)
 			_characterAnimator.SetInteger("RunType", 1);
 		else if (_moveInput.y > 0.1f && _moveInput.x > 0.1f)
