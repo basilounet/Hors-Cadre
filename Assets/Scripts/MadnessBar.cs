@@ -5,8 +5,8 @@ public class MadnessBar : MonoBehaviour
 {
     
     [SerializeField] private ai _aiScript;
-    [SerializeField] private Vector3 _offset = new Vector3(0, 3, 0);
-    [SerializeField] private Vector3 _textOffset = new Vector3(0, 3.5f, 0);
+    [SerializeField] private Vector3 _offset = new Vector3(0, 5, 0);
+    [SerializeField] private Vector3 _textOffset = new Vector3(0, 5.5f, 0);
     [SerializeField] private Vector2 size = new Vector2(60, 10);
     private Camera _camera;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using TMPro;
 using UnityEngine;
@@ -65,7 +66,7 @@ public class PlayerMouvment : MonoBehaviour
 	void FixedUpdate()
 	{
 		_moveInput = _moveAction.ReadValue<Vector2>();
-		_MoneyText.text = "Money : " + Points._money.ToString() + " $$$";
+		_MoneyText.text = "Money : " + Math.Round(Points._money).ToString() + " $$$";
 		Moving();
 	}
 

@@ -1,5 +1,6 @@
 using System;
-using Mono.Cecil;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -13,7 +14,15 @@ public class ai : MonoBehaviour
 	private static readonly int Idle = Animator.StringToHash("Idle");
 	private static readonly int Sit = Animator.StringToHash("sit");
 
-	private struct Increment { public float min, max, time, delta; };
+	[SerializeField] private Vector3 _offset = new Vector3(0, 5, 0);
+	[SerializeField] private Vector3 _textOffset = new Vector3(0, 5.5f, 0);
+	[SerializeField] private Vector2 size = new Vector2(60, 10);
+	private Camera _camera;
+
+	private struct Increment {
+		public float min, max, time, delta, nextStep;
+		public Action func;
+	};
 
 	[SerializeField] private GameObject chair;
 	 private Animator 			_characterAnimator;
@@ -23,6 +32,7 @@ public class ai : MonoBehaviour
 	private Boolean _chairReached;
 	private Boolean _onDesk;
 	private Vector3 _lastTargetPos;
+	private Dictionary<string, Increment> _madnessIncrements = new Dictionary<string, Increment>();
 	private Increment _madnessIncr;
 	public float _madness;
 	public string _state;
@@ -35,8 +45,17 @@ public class ai : MonoBehaviour
 		_nma = GetComponent<NavMeshAgent>();
 		_characterAnimator = GetComponent<Animator>();
 		_lastTargetPos = chair.transform.position + new Vector3(1, 1, 1);
-		_madnessIncr = new Increment { min = 0, max = 0.5f, time = 0, delta = 2 };
+		_madnessIncrements.AddRange(new Dictionary<string, Increment>
+		{
+			{ "Normal", new Increment { min = 0.5f, max = 0.75f, time = 0, delta = 1, nextStep = 10, func = NormalBehaviour } },
+			{ "UnBothered", new Increment { min = 0.75f, max = 1f, time = 0, delta = 1, nextStep = 20, func = UnBotheredBehaviour } },
+			{ "Deranged", new Increment { min = 1f, max = 2f, time = 0, delta = .5f, nextStep = 45, func = DerangedBehaviour } },
+			{ "Crazy", new Increment { min = 1.75f, max = 2.75f, time = 0, delta = .5f, nextStep = 70, func = CrazyBehaviour } },
+			{ "Insane", new Increment { min = 2f, max = 3.5f, time = 0, delta = .25f, nextStep = 105, func = InsaneBehaviour } }
+		});
+		_madnessIncr = _madnessIncrements["Normal"];
 		_madness = 0;
+		_camera = Camera.main;
 	}
 
 	// Update is called once per frame
@@ -44,20 +63,18 @@ public class ai : MonoBehaviour
 	{
 		_madness += HandleMadnessIncr();
 
-		if (_madness <= 20)
-			NormalBehaviour();
-		else if (_madness <= 45)
-			UnBotheredBehaviour();
-		else
-		{
-			_onDesk = false;
-			_chairReached = false;
-			if (_madness <= 70)
-				DerangedBehaviour();
-			else if (_madness <= 105)
-				CrazyBehaviour();
-			else if (_madness <= 140)
-				InsaneBehaviour();
+		for (var i = 0; i < _madnessIncrements.Count; i++) {
+			var madnessIncr = _madnessIncrements.ElementAt(i);
+			if (_madness < madnessIncr.Value.nextStep || i == _madnessIncrements.Count - 1) {
+				if (i >= 2) {
+					_onDesk = false;
+					_chairReached = false;
+				}
+				if (madnessIncr.Value.func != _madnessIncr.func)
+					_madnessIncr = madnessIncr.Value;
+				_madnessIncr.func.Invoke();
+				break ;
+			}
 		}
 	}
 
@@ -75,7 +92,7 @@ public class ai : MonoBehaviour
 	private void NormalBehaviour()
 	{
 		_state = "Normal";
-		_madnessIncr = new Increment { min = 0.2f, max = 0.5f, time = _madnessIncr.time, delta = 2 };
+		// _madnessIncr = _madnessIncrements["Normal"];
 		if (Vector3.Distance(transform.position, chair.transform.position) > 2f) {
 			_chairReached = false;
 			_characterAnimator.SetBool(IsWalking, true);
@@ -107,14 +124,14 @@ public class ai : MonoBehaviour
 	private void UnBotheredBehaviour()
 	{
 		_state = "UnBothered";
-		_madnessIncr = new Increment { min = 0.3f, max = 0.75f, time = _madnessIncr.time, delta = 2 };
+		// _madnessIncr = _madnessIncrements["UnBothered"];
 		//#stopwork
 		//#on desk animations
 	}
 	private void DerangedBehaviour()
 	{
 		_state = "Deranged";
-		_madnessIncr = new Increment { min = 0.5f, max = 1, time = _madnessIncr.time, delta = 1.5f };
+		// _madnessIncr = _madnessIncrements["Deranged"];
 		_onDesk = false;
 		_chairReached = false;
 		//# get out of desk
@@ -124,7 +141,7 @@ public class ai : MonoBehaviour
 	private void CrazyBehaviour()
 	{
 		_state = "Crazy";
-		_madnessIncr = new Increment { min = 0.75f, max = 1.25f, time = _madnessIncr.time, delta = 1.5f };
+		// _madnessIncr = _madnessIncrements["Crazy"];
 		//# starts running around
 		_onDesk = false;
 		_chairReached = false;
@@ -133,10 +150,40 @@ public class ai : MonoBehaviour
 	private void InsaneBehaviour()
 	{
 		_state = "Insane";
-		_madnessIncr = new Increment { min = 1, max = 1.5f, time = _madnessIncr.time, delta = 1.5f };
+		// _madnessIncr = _madnessIncrements["Insane"];
 		//# starts tweaking
 		_onDesk = false;
 		_chairReached = false;
 
+	}
+	
+	void OnGUI() {
+		Vector3 worldPos = transform.position + _offset;
+		Vector3 screenPos = _camera.WorldToScreenPoint(worldPos);
+
+		if (screenPos.z > 0)
+		{
+			float max = _madnessIncrements["Insane"].nextStep;
+			float fill =  Mathf.Clamp(_madness, 0, max) / max;
+			Rect bgRect = new Rect(screenPos.x - size.x / 2, Screen.height - screenPos.y, size.x, size.y);
+			GUI.color = Color.black;
+			GUI.DrawTexture(bgRect, Texture2D.whiteTexture);
+			GUI.color = Color.Lerp(Color.green, Color.red, fill);
+			GUI.DrawTexture(new Rect(bgRect.x + 1, bgRect.y + 1, (size.x - 2) * fill, size.y - 2), Texture2D.whiteTexture);
+			GUI.color = Color.white;
+		}
+        
+		// AI state text
+		Vector3 textWorldPos = transform.position + _textOffset;
+		Vector3 textScreenPos = _camera.WorldToScreenPoint(textWorldPos);
+		if (textScreenPos.z > 0)
+		{
+			Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(_state));
+			Rect textRect = new Rect(textScreenPos.x - textSize.x / 2, Screen.height - textScreenPos.y, textSize.x, textSize.y);
+			GUI.color = Color.white;
+			// float fill = Mathf.Clamp(_aiScript._madness, 0, 150) / 150f;
+			// GUI.color = Color.Lerp(Color.green, Color.red, fill);
+			GUI.Label(textRect, _state);
+		}
 	}
 }
