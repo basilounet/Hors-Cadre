@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 286a2fee2c0c01242984a815d0ed0579, type: 2}
     - target: {fileID: -8679921383154817045, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.43
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.29
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -69,6 +69,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 286a2fee2c0c01242984a815d0ed0579, type: 2}
     - target: {fileID: -4833337129042355886, guid: d376062c421ac9641babbb428ee7401e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 286a2fee2c0c01242984a815d0ed0579, type: 2}
+    - target: {fileID: 73362268754038293, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 286a2fee2c0c01242984a815d0ed0579, type: 2}
@@ -125,9 +129,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8779137829114228235}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d376062c421ac9641babbb428ee7401e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3404761740728536084}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d376062c421ac9641babbb428ee7401e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8028190612491731650}
@@ -202,25 +203,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ed66f5aa8fb483d9bb11586d21d6fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _offset: {x: 0, y: 5, z: 0}
+  _textOffset: {x: 0, y: 5.5, z: 0}
+  size: {x: 60, y: 10}
   chair: {fileID: 0}
   _madness: 0
   _state: 
---- !u!114 &3404761740728536084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7547321787721547641}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dadbc1586f918649af57413e170b07f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _aiScript: {fileID: 8779137829114228235}
-  _offset: {x: 0, y: 3, z: 0}
-  _textOffset: {x: 0, y: 3.5, z: 0}
-  size: {x: 60, y: 10}
 --- !u!195 &8028190612491731650
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -260,7 +248,12 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'lower'\n\tTransform 'upper'\n\tTransform 'right_leg'\n\tTransform
+    'lower_left_leg'\n\tTransform 'lower_right_leg'\n\tTransform 'upper'\n\tTransform
+    'left_leg'\n\tTransform 'lower_left_arm'\n\tTransform 'lower_right_arm'\n\tTransform
+    'left_arm'\n\tand more ...\n\tFrom animation clip 'sit'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
