@@ -3,6 +3,7 @@ using System.Drawing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class PlayerMouvment : MonoBehaviour
 {
@@ -16,10 +17,12 @@ public class PlayerMouvment : MonoBehaviour
     private InputAction		_moveAction;
     private InputAction		_jumpAction;
     private InputAction		_SprintAction;
+    private InputAction		_interactAction;
 
     private Vector2     	_moveInput;
     private Rigidbody		_rb;
 	private ParticleSystem	_jumpParticles;
+	private ParticleSystem	_shoutParticles;
 	private	bool			_isRunning;
 	private TextMeshProUGUI			_MoneyText;
 
@@ -28,6 +31,11 @@ public class PlayerMouvment : MonoBehaviour
 	[SerializeField] private float	_movementSmoothing = 10f; // Higher values = more responsive, lower = smoother
 	[SerializeField] private bool	_isGrounded = true;
 	[SerializeField] private float	_jumpForce = 5f;
+	
+	[SerializeField] private float _lookRange = 20f;
+	[SerializeField] private LayerMask _aiLayer;
+	[SerializeField] private float _madnessDecrease = 5f;
+	[SerializeField] private float _shoutMadnessDecrease = 40f;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
@@ -37,9 +45,11 @@ public class PlayerMouvment : MonoBehaviour
 		_moveAction = InputAction.FindActionMap("Player").FindAction("Move");
 		_jumpAction = InputAction.FindActionMap("Player").FindAction("Jump");
 		_SprintAction = InputAction.FindActionMap("Player").FindAction("Sprint");
+		_interactAction = InputAction .FindActionMap("Player").FindAction("Interact");
 
 		_rb = GetComponent<Rigidbody>();
 		_jumpParticles = GetComponentInChildren<ParticleSystem>();
+		_shoutParticles = transform.Find("LookAt")?.GetComponentInChildren<ParticleSystem>();
 		_characterAnimator = GetComponent<Animator>();
 		_MoneyText = _MoneyTextObject.GetComponent<TextMeshProUGUI>();
 
@@ -55,6 +65,7 @@ public class PlayerMouvment : MonoBehaviour
 		transform.rotation = new Quaternion(0, Camera.transform.rotation.y, 0, Camera.transform.rotation.w);
 		if (_jumpAction.WasPressedThisFrame() && _isGrounded && !_characterAnimator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
 			Jump();
+		CheckLookAtAI();
     }
 
 	void Jump() {
@@ -128,5 +139,20 @@ public class PlayerMouvment : MonoBehaviour
 			_isGrounded = true;
 		}
 	}
-
+	
+	private void CheckLookAtAI()
+	{
+		Ray ray = new Ray(Camera.transform.position, Camera.transform.forward);
+		if (Physics.Raycast(ray, out RaycastHit hit, _lookRange, _aiLayer))
+		{
+			var ai = hit.collider.GetComponent<ai>();
+			if (ai)
+				ai._madness = Mathf.Max(0, ai._madness - _madnessDecrease * Time.deltaTime);
+			if (ai && _interactAction.WasPressedThisFrame())
+			{
+				ai._madness = Mathf.Clamp(ai._madness - _shoutMadnessDecrease, 0, ai.GetMaxMadness());
+				_shoutParticles.Play();
+			}
+		}
+	}
 }

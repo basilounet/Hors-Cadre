@@ -85,6 +85,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Escape",
+                    "type": "Button",
+                    "id": "575a00e7-9f7e-4d05-b085-731e4c0f0770",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -472,6 +481,17 @@
                     "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e24220a1-c664-491c-956c-723596ae7edc",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -565,6 +585,15 @@
                     "type": "PassThrough",
                     "id": "9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Escape",
+                    "type": "Button",
+                    "id": "0ba6903a-ca19-48d0-a8dc-56c59684b1e5",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -986,6 +1015,17 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b98606f-d522-4363-96c8-629a7605b4ac",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Escape",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

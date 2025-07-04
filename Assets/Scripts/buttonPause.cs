@@ -1,13 +1,22 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PauseManager : MonoBehaviour
 {
     public GameObject pauseMenuUI;
+    [SerializeField] private InputActionAsset	InputAction;
+    private InputAction		_escapeAction;
     private bool isPaused = false;
 
+    void Start()
+    {
+        _escapeAction = InputAction.FindActionMap("Player").FindAction("Escape");
+
+    }
+    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (_escapeAction.WasPressedThisFrame())
         {
             if (isPaused)
                 Resume();
@@ -32,7 +41,7 @@ public class PauseManager : MonoBehaviour
 
     public void QuitGame()
     {
-        // Pour quitter le jeu (ne marche pas dans l’éditeur)
+        // Pour quitter le jeu (ne marche pas dans lï¿½ï¿½diteur)
         Application.Quit();
     }
 }
