@@ -181,9 +181,10 @@ public class ai : MonoBehaviour
 		_chairReached = false;
 		if (Vector3.Distance(_nma.destination, transform.position) < 2)
 		{
-			_characterAnimator.SetBool(IsWalking, true);
-			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
-			_nma.SetDestination(newPos);
+			_characterAnimator.SetBool(IsWalking, false);
+		// 	_characterAnimator.SetBool(IsWalking, true);
+		// 	Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+		// 	_nma.SetDestination(newPos);
 		}
 	}
 	private void InsaneBehaviour()
