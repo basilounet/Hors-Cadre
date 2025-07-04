@@ -15,11 +15,14 @@ public class ai : MonoBehaviour
 	private static readonly int Idle = Animator.StringToHash("Idle");
 	private static readonly int Sit = Animator.StringToHash("Sit");
 	private static readonly int IsDancing = Animator.StringToHash("IsDancing");
+	private static readonly int IsRunning = Animator.StringToHash("IsRunning");
 
 	[SerializeField] private Vector3 _offset = new Vector3(0, 5, 0);
 	[SerializeField] private Vector3 _textOffset = new Vector3(0, 5.5f, 0);
 	[SerializeField] private Vector2 size = new Vector2(60, 10);
 	[SerializeField] private List<Transform> _waypoints;
+	[SerializeField] private float _speed = 5f;
+	[SerializeField] private float _runSpeed = 10f;
 	
 	private Camera _camera;
 	private struct Increment {
@@ -28,16 +31,19 @@ public class ai : MonoBehaviour
 	};
 
 	[SerializeField] private GameObject chair;
+	[SerializeField] private GameObject table;
 	 private Animator 			_characterAnimator;
 
-	
+	[SerializeField] private Texture moneyUp;
+	[SerializeField] private Texture moneyDown;
+	[SerializeField] private Texture youtube;
 	private NavMeshAgent _nma;
 	private Boolean _chairReached;
 	private Boolean _onDesk;
-	private Vector3 _lastTargetPos;
 	private Vector3 _targetPos;
 	private Dictionary<string, Increment> _madnessIncrements = new Dictionary<string, Increment>();
 	private Increment _madnessIncr;
+	private MeshRenderer _tableMesh;
 	public float _madness;
 	public string _state;
 
@@ -53,20 +59,19 @@ public class ai : MonoBehaviour
 		_onDesk = false;
 		_nma = GetComponent<NavMeshAgent>();
 		_characterAnimator = GetComponent<Animator>();
-		_lastTargetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_targetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_madnessIncrements.AddRange(new Dictionary<string, Increment>
 		{
-			{ "Normal", new Increment { min = 5.5f, max = 0.75f, time = 0, delta = 1, nextStep = 10, func = NormalBehaviour } },
-			{ "UnBothered", new Increment { min = 5.75f, max = 1f, time = 0, delta = 1, nextStep = 20, func = UnBotheredBehaviour } },
-			{ "Deranged", new Increment { min = 5f, max = 2f, time = 0, delta = .5f, nextStep = 45, func = DerangedBehaviour } },
-			{ "Crazy", new Increment { min = 5.75f, max = 2.75f, time = 0, delta = .5f, nextStep = 85, func = CrazyBehaviour } },
-			{ "Insane", new Increment { min = 5f, max = 3.5f, time = 0, delta = .35f, nextStep = 120, func = InsaneBehaviour } }
+			{ "Normal", new Increment { min = 0.5f, max = 1f, time = 0, delta = 1, nextStep = 10, func = NormalBehaviour } },
+			{ "UnBothered", new Increment { min = 0.75f, max = 1.5f, time = 0, delta = 1, nextStep = 20, func = UnBotheredBehaviour } },
+			{ "Deranged", new Increment { min = 1.5f, max = 3f, time = 0, delta = .75f, nextStep = 45, func = DerangedBehaviour } },
+			{ "Crazy", new Increment { min = 1.25f, max = 2.5f, time = 0, delta = .5f, nextStep = 100, func = CrazyBehaviour } },
+			{ "Insane", new Increment { min = 2f, max = 3.5f, time = 0, delta = .35f, nextStep = 140, func = InsaneBehaviour } }
 		});
 		_madnessIncr = _madnessIncrements["Normal"];
 		_madness = 0;
 		_camera = Camera.main;
-		var meshRenderer = GetComponentInChildren<MeshRenderer>();
+		_tableMesh = table.transform.Find("computer/screen/cuboid_1")?.GetComponent<MeshRenderer>();
 	}
 
 	// Update is called once per frame
@@ -111,7 +116,11 @@ public class ai : MonoBehaviour
 	private void NormalBehaviour()
 	{
 		_state = "Normal";
+		_tableMesh.material.SetTexture("_BaseMap", moneyUp);
 		_characterAnimator.SetBool(IsDancing, false);
+		_characterAnimator.SetBool(IsRunning, false);
+		_nma.speed = _speed;
+		_nma.acceleration = _speed * 2;
 		if (Vector3.Distance(transform.position, chair.transform.position) > 2f) {
 			_chairReached = false;
 			_characterAnimator.SetBool(IsWalking, true);
@@ -124,49 +133,75 @@ public class ai : MonoBehaviour
 			//# get on desk
 			//# startwork
 		}
-		if (!_chairReached && chair.transform.position != _lastTargetPos)
+		if (!_chairReached && chair.transform.position != _nma.destination)
 		{
 			_nma.SetDestination(chair.transform.position);
-			if (!_onDesk)
-			{
-				_onDesk = true;
-				_characterAnimator.SetTrigger(Sit);
-			}
 		}
 	}
 
 	private void UnBotheredBehaviour()
 	{
+		_tableMesh.material.SetTexture("_BaseMap", youtube);
 		_state = "UnBothered";
 		_characterAnimator.SetBool(IsDancing, false);
-		Work();
+		_characterAnimator.SetBool(IsRunning, false);
+		_nma.speed = _speed;
+		_nma.acceleration = _speed * 2;
 		//#stopwork
 		//#on desk animations
 	}
 	private void DerangedBehaviour()
 	{
+		_tableMesh.material.SetTexture("_BaseMap", moneyDown);
 		_state = "Deranged";
 		_characterAnimator.SetBool(IsDancing, false);
+		_characterAnimator.SetBool(IsRunning, false);
+		_nma.speed = _speed;
+		_nma.acceleration = _speed * 2;
 		_onDesk = false;
 		_chairReached = false;
 		//# get out of desk
 		//# starts walking around
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	private void CrazyBehaviour()
 	{
 		_state = "Crazy";
 		_characterAnimator.SetBool(IsDancing, true);
+		_characterAnimator.SetBool(IsRunning, false);
+		_nma.speed = _speed;
+		_nma.acceleration = _speed * 2;
 		_characterAnimator.SetInteger("DanceType", UnityEngine.Random.Range(1, 6));
 		_onDesk = false;
 		_chairReached = false;
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	private void InsaneBehaviour()
 	{
 		_state = "Insane";
 		//# starts tweaking
 		_characterAnimator.SetBool(IsDancing, false);
+		_characterAnimator.SetBool(IsRunning, true);
+			_nma.speed = _runSpeed;
+			_nma.acceleration = _runSpeed * 2;
 		_onDesk = false;
 		_chairReached = false;
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	
 	void OnGUI() {
