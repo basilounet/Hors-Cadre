@@ -17,8 +17,9 @@ public class ai : MonoBehaviour
 	[SerializeField] private Vector3 _offset = new Vector3(0, 5, 0);
 	[SerializeField] private Vector3 _textOffset = new Vector3(0, 5.5f, 0);
 	[SerializeField] private Vector2 size = new Vector2(60, 10);
+	[SerializeField] private List<Transform> _waypoints;
+	
 	private Camera _camera;
-
 	private struct Increment {
 		public float min, max, time, delta, nextStep;
 		public Action func;
@@ -32,6 +33,7 @@ public class ai : MonoBehaviour
 	private Boolean _chairReached;
 	private Boolean _onDesk;
 	private Vector3 _lastTargetPos;
+	private Vector3 _targetPos;
 	private Dictionary<string, Increment> _madnessIncrements = new Dictionary<string, Increment>();
 	private Increment _madnessIncr;
 	public float _madness;
@@ -45,6 +47,7 @@ public class ai : MonoBehaviour
 		_nma = GetComponent<NavMeshAgent>();
 		_characterAnimator = GetComponent<Animator>();
 		_lastTargetPos = chair.transform.position + new Vector3(1, 1, 1);
+		_targetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_madnessIncrements.AddRange(new Dictionary<string, Increment>
 		{
 			{ "Normal", new Increment { min = 0.5f, max = 0.75f, time = 0, delta = 1, nextStep = 10, func = NormalBehaviour } },
@@ -89,6 +92,13 @@ public class ai : MonoBehaviour
 		return (0);
 	}
 
+	private void Work() {
+		_chairReached = true;
+		_characterAnimator.SetBool(IsWalking, false);
+		_characterAnimator.SetTrigger(Idle);
+		Points._money += 1 * Time.fixedDeltaTime;
+	}
+	
 	private void NormalBehaviour()
 	{
 		_state = "Normal";
@@ -101,10 +111,7 @@ public class ai : MonoBehaviour
 		{
 			if (!_chairReached)
 				_nma.SetDestination(transform.position);
-			_chairReached = true;
-			_characterAnimator.SetBool(IsWalking, false);
-			_characterAnimator.SetTrigger(Idle);
-			Points._money += 1 * Time.fixedDeltaTime;
+			Work();
 			//# get on desk
 			//# startwork
 		}
@@ -117,40 +124,33 @@ public class ai : MonoBehaviour
 				_characterAnimator.SetTrigger(Sit);
 			}
 		}
-		// Debug.Log(Vector3.Distance(transform.position, chair.transform.position));
-		// Debug.Log(_nma.destination);
 	}
 
 	private void UnBotheredBehaviour()
 	{
 		_state = "UnBothered";
-		// _madnessIncr = _madnessIncrements["UnBothered"];
+		Work();
 		//#stopwork
 		//#on desk animations
 	}
 	private void DerangedBehaviour()
 	{
 		_state = "Deranged";
-		// _madnessIncr = _madnessIncrements["Deranged"];
 		_onDesk = false;
 		_chairReached = false;
 		//# get out of desk
 		//# starts walking around
-
+		
 	}
 	private void CrazyBehaviour()
 	{
 		_state = "Crazy";
-		// _madnessIncr = _madnessIncrements["Crazy"];
-		//# starts running around
 		_onDesk = false;
 		_chairReached = false;
-
 	}
 	private void InsaneBehaviour()
 	{
 		_state = "Insane";
-		// _madnessIncr = _madnessIncrements["Insane"];
 		//# starts tweaking
 		_onDesk = false;
 		_chairReached = false;
