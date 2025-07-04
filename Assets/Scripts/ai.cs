@@ -26,16 +26,19 @@ public class ai : MonoBehaviour
 	};
 
 	[SerializeField] private GameObject chair;
+	[SerializeField] private GameObject table;
 	 private Animator 			_characterAnimator;
 
-	
+	[SerializeField] private Texture moneyUp;
+	[SerializeField] private Texture moneyDown;
+	[SerializeField] private Texture youtube;
 	private NavMeshAgent _nma;
 	private Boolean _chairReached;
 	private Boolean _onDesk;
-	private Vector3 _lastTargetPos;
 	private Vector3 _targetPos;
 	private Dictionary<string, Increment> _madnessIncrements = new Dictionary<string, Increment>();
 	private Increment _madnessIncr;
+	private MeshRenderer _tableMesh;
 	public float _madness;
 	public string _state;
 
@@ -46,7 +49,6 @@ public class ai : MonoBehaviour
 		_onDesk = false;
 		_nma = GetComponent<NavMeshAgent>();
 		_characterAnimator = GetComponent<Animator>();
-		_lastTargetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_targetPos = chair.transform.position + new Vector3(1, 1, 1);
 		_madnessIncrements.AddRange(new Dictionary<string, Increment>
 		{
@@ -59,6 +61,8 @@ public class ai : MonoBehaviour
 		_madnessIncr = _madnessIncrements["Normal"];
 		_madness = 0;
 		_camera = Camera.main;
+		_tableMesh = table.transform.Find("computer/screen/cuboid_1")?.GetComponent<MeshRenderer>();
+		Debug.Log(_tableMesh);
 	}
 
 	// Update is called once per frame
@@ -102,8 +106,10 @@ public class ai : MonoBehaviour
 	private void NormalBehaviour()
 	{
 		_state = "Normal";
+		_tableMesh.material.SetTexture("_BaseMap", moneyUp);
 		// _madnessIncr = _madnessIncrements["Normal"];
-		if (Vector3.Distance(transform.position, chair.transform.position) > 2f) {
+		if (Vector3.Distance(transform.position, chair.transform.position) > 2f)
+		{
 			_chairReached = false;
 			_characterAnimator.SetBool(IsWalking, true);
 		}
@@ -115,46 +121,55 @@ public class ai : MonoBehaviour
 			//# get on desk
 			//# startwork
 		}
-		if (!_chairReached && chair.transform.position != _lastTargetPos)
+		if (!_chairReached && chair.transform.position != _nma.destination)
 		{
 			_nma.SetDestination(chair.transform.position);
-			if (!_onDesk)
-			{
-				_onDesk = true;
-				_characterAnimator.SetTrigger(Sit);
-			}
 		}
 	}
 
 	private void UnBotheredBehaviour()
 	{
+		_tableMesh.material.SetTexture("_BaseMap", youtube);
 		_state = "UnBothered";
-		Work();
 		//#stopwork
 		//#on desk animations
 	}
 	private void DerangedBehaviour()
 	{
+		_tableMesh.material.SetTexture("_BaseMap", moneyDown);
 		_state = "Deranged";
-		_onDesk = false;
 		_chairReached = false;
 		//# get out of desk
 		//# starts walking around
-		
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	private void CrazyBehaviour()
 	{
 		_state = "Crazy";
-		_onDesk = false;
 		_chairReached = false;
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	private void InsaneBehaviour()
 	{
 		_state = "Insane";
 		//# starts tweaking
-		_onDesk = false;
 		_chairReached = false;
-
+		if (Vector3.Distance(_nma.destination, transform.position) < 2)
+		{
+			_characterAnimator.SetBool(IsWalking, true);
+			Vector3 newPos = _waypoints[UnityEngine.Random.Range(0, _waypoints.Count() - 1)].position;
+			_nma.SetDestination(newPos);
+		}
 	}
 	
 	void OnGUI() {
